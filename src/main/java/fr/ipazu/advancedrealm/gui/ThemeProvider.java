@@ -1,6 +1,7 @@
 package fr.ipazu.advancedrealm.gui;
 
 
+import fr.ipazu.advancedrealm.Main;
 import fr.ipazu.advancedrealm.realm.Realm;
 import fr.ipazu.advancedrealm.realm.themes.ThemeType;
 import fr.ipazu.advancedrealm.utils.ItemsUtils;
@@ -35,12 +36,11 @@ public class ThemeProvider implements InventoryProvider {
         }
         @Override
         public void init(Player player, InventoryContents inventoryContents) {
-            ClickableItem basic = ClickableItem.of(new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1, (byte) 15), e -> e.setCancelled(true));
-            inventoryContents.fill(basic);
             for(ThemeType t : avaibletheme){
                 setItem(inventoryContents,ClickableItem.of(t.getItem(),e ->{
                     realm.getTheme().setThemeType(t);
                     realm.getTheme().spawnTheme();
+                    player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
                     player.sendMessage("§aSuccessfully changed the type to: §e§l"+t.getName());
                     e.setCancelled(true);
                     player.closeInventory();
@@ -49,6 +49,7 @@ public class ThemeProvider implements InventoryProvider {
             }
             inventoryContents.set(2, 0, ClickableItem.of(new ItemsUtils(Material.RED_BED, "⬅ §bGo back", Arrays.asList("", "§7Click to go back to the", "§7Realm options.")).toItemStack(), e -> {
                 e.setCancelled(true);
+                player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
                 player.closeInventory();
                 new WholeGUI().openRealmGui(player, realm, false);
             }));
@@ -62,11 +63,9 @@ public class ThemeProvider implements InventoryProvider {
         private void setItem(InventoryContents inventoryContents, ClickableItem clickableItem) {
             SlotIterator iterator = inventoryContents.newIterator(SlotIterator.Type.HORIZONTAL, 0, 0);
             while (!iterator.ended()) {
-                if (iterator.get().isPresent()) {
-                    if (iterator.get().get().getItem().getType() == Material.GRAY_STAINED_GLASS_PANE) {
-                        inventoryContents.set(iterator.row(), iterator.column(), clickableItem);
-                        return;
-                    }
+                if (!iterator.get().isPresent()) {
+                    inventoryContents.set(iterator.row(), iterator.column(), clickableItem);
+                    return;
                 }
                 iterator.next();
             }

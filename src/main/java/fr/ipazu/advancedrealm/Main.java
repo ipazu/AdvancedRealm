@@ -31,6 +31,11 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
+        if (!checkDependencies()) {
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         invManager = new InventoryManager(this);
         invManager.init();
         try {
@@ -41,9 +46,7 @@ public class Main extends JavaPlugin {
             getLogger().severe("Failed to initialize SmartInvs manager");
         }
 
-        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null){
-            new ARExpansion(this).register();
-        }
+        logOptionalPlugins();
         new ConfigFiles().init();
         new EventManager(this);
         getCommand("unclaim").setExecutor(new Unclaim());
@@ -59,8 +62,37 @@ public class Main extends JavaPlugin {
     public void onDisable() {
     }
 
+    private boolean checkDependencies() {
+        boolean allFound = true;
+        if (Bukkit.getPluginManager().getPlugin("WorldEdit") == null) {
+            getLogger().severe("WorldEdit is required but not installed. Download WorldEdit from https://dev.bukkit.org/projects/worldedit");
+            allFound = false;
+        }
+        if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
+            getLogger().severe("Vault is required but not installed. Download Vault from https://www.spigotmc.org/resources/vault.34315/");
+            allFound = false;
+        }
+        return allFound;
+    }
+
+    private void logOptionalPlugins() {
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            Bukkit.getConsoleSender().sendMessage("§e[AdvancedRealm] PlaceholderAPI found - placeholders enabled");
+        } else {
+            Bukkit.getConsoleSender().sendMessage("§e[AdvancedRealm] PlaceholderAPI not found - placeholders disabled");
+        }
+        if (Bukkit.getPluginManager().getPlugin("Vault") != null && setupEconomy()) {
+            Bukkit.getConsoleSender().sendMessage("§e[AdvancedRealm] Economy plugin found (" + economy.getClass().getSimpleName() + ") - economy features enabled");
+        } else if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
+            Bukkit.getConsoleSender().sendMessage("§e[AdvancedRealm] Vault not found - economy features disabled");
+        } else {
+            Bukkit.getConsoleSender().sendMessage("§e[AdvancedRealm] No economy plugin found - economy features disabled");
+        }
+    }
+
     public boolean setupEconomy() {
-        RegisteredServiceProvider<Economy> economyProvider = Main.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
+        if (Bukkit.getPluginManager().getPlugin("Vault") == null) return false;
+        RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
         if (economyProvider != null) {
             economy = economyProvider.getProvider();
         }

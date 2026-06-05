@@ -15,6 +15,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +67,12 @@ public class Realm {
     public void teleportToSpawn(Player player) {
         player.setFallDistance(0);
         player.teleport(theme.getSpawn().clone().add(0.5, 1, 0.5));
-        sendWorldBorderPacket(player);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                sendWorldBorderPacket(player);
+            }
+        }.runTaskLater(Main.getInstance(), 2);
     }
 
     public void sendBorderToAll() {
@@ -79,9 +85,7 @@ public class Realm {
     }
 
     public Location getCenter() {
-        int i = level.getBordersize() - RealmLevel.getLevel(1).getBordersize();
-        Location center = theme.getSpawn().clone().add(0, 0, i + theme.getThemeType().getNblock() - 4.5 * level.getNumber());
-        return center;
+        return theme.getSpawn().clone().add(0, 0, 0);
     }
 
     public void sendWorldBorderPacket(Player player) {

@@ -9,6 +9,7 @@ public class WorldBorder {
         org.bukkit.WorldBorder border = Bukkit.createWorldBorder();
         border.setCenter(center.getBlockX(), center.getBlockZ());
         border.setSize(size);
+        border.setWarningDistance(3);
         player.setWorldBorder(border);
     }
 }

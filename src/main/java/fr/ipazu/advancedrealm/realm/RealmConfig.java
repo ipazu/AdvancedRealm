@@ -178,37 +178,51 @@ public class RealmConfig {
     }
 
     public void loadRealm(String name) {
-        for (String s : config.getConfigurationSection("realms." + name + ".players").getKeys(false)) {
-            if (RealmPlayer.getPlayer(s) == null)
-                new RealmPlayer(s, config.getString("realms." + name + ".players." + s + ".name"));
-        }
-        Location spawn = new Location(ConfigFiles.getWorld(), config.getInt("realms." + name + ".theme.spawn.x"), config.getInt("realms." + name + ".theme.spawn.y"), config.getInt("realms." + name + ".theme.spawn.z"), (float) config.getInt("realms." + name + ".theme.spawn.yaw"), (float) config.getInt("realms." + name + ".theme.spawn.pitch"));
-        ThemeType themeType = ThemeType.themeTypes.get(config.getString("realms." + name + ".theme.id"));
-        if (themeType == null) {
-            themeType = ThemeType.allthemeTypes.isEmpty() ? null : ThemeType.allthemeTypes.get(0);
-        }
-        String ownerUuid = config.getString("realms." + name + ".owner.uuid");
-        if (RealmPlayer.getPlayer(ownerUuid) == null) {
-            new RealmPlayer(ownerUuid, config.getString("realms." + name + ".owner.name"));
-        }
-        Realm realm = new Realm(RealmPlayer.getPlayer(ownerUuid), themeType, spawn, config.getInt("realms." + name + ".level"), config.getInt("realms." + name + ".vote"));
-        for (String s : config.getConfigurationSection("realms." + name + ".players").getKeys(false)) {
-            RealmPlayer rp = RealmPlayer.getPlayer(s);
-            if (rp.getOwned() != realm) {
-                realm.addPlayer(rp);
-                realm.promote(rp, RealmRank.getRankByString(config.getString("realms." + name + ".players." + s + ".rank")));
+        try {
+            if (config.getConfigurationSection("realms." + name + ".players") != null) {
+                for (String s : config.getConfigurationSection("realms." + name + ".players").getKeys(false)) {
+                    if (RealmPlayer.getPlayer(s) == null)
+                        new RealmPlayer(s, config.getString("realms." + name + ".players." + s + ".name"));
+                }
             }
-        }
-        realm.setOwner(RealmPlayer.getPlayer(config.getString("realms." + name + ".owner.uuid")));
-        realm.setPrivacy(config.getBoolean("realms." + name + ".privacy"));
-        realm.setPerk(config.getString("realms."+name+".perk"));
-        if (config.getConfigurationSection("realms." + name + ".banned") != null) {
-            for (String s : config.getConfigurationSection("realms." + name + ".banned").getKeys(false)) {
-                if (RealmPlayer.getPlayer(s) == null)
-                    new RealmPlayer(s, config.getString("realms." + name + ".banned." + s + ".name"));
-                realm.banPlayer(RealmPlayer.getPlayer(s));
-
+            Location spawn = new Location(ConfigFiles.getWorld(),
+                config.getInt("realms." + name + ".theme.spawn.x"),
+                config.getInt("realms." + name + ".theme.spawn.y"),
+                config.getInt("realms." + name + ".theme.spawn.z"),
+                (float) config.getInt("realms." + name + ".theme.spawn.yaw"),
+                (float) config.getInt("realms." + name + ".theme.spawn.pitch"));
+            ThemeType themeType = ThemeType.themeTypes.get(config.getString("realms." + name + ".theme.id"));
+            if (themeType == null) {
+                themeType = ThemeType.allthemeTypes.isEmpty() ? null : ThemeType.allthemeTypes.get(0);
             }
+            String ownerUuid = config.getString("realms." + name + ".owner.uuid");
+            if (ownerUuid != null && RealmPlayer.getPlayer(ownerUuid) == null) {
+                new RealmPlayer(ownerUuid, config.getString("realms." + name + ".owner.name"));
+            }
+            RealmPlayer owner = ownerUuid != null ? RealmPlayer.getPlayer(ownerUuid) : null;
+            if (owner == null) return;
+            Realm realm = new Realm(owner, themeType, spawn, Math.max(1, config.getInt("realms." + name + ".level")), Math.max(0, config.getInt("realms." + name + ".vote")));
+            if (config.getConfigurationSection("realms." + name + ".players") != null) {
+                for (String s : config.getConfigurationSection("realms." + name + ".players").getKeys(false)) {
+                    RealmPlayer rp = RealmPlayer.getPlayer(s);
+                    if (rp != null && rp.getOwned() != realm) {
+                        realm.addPlayer(rp);
+                        realm.promote(rp, RealmRank.getRankByString(config.getString("realms." + name + ".players." + s + ".rank")));
+                    }
+                }
+            }
+            realm.setPrivacy(config.getBoolean("realms." + name + ".privacy"));
+            realm.setPerk(config.getString("realms."+name+".perk"));
+            if (config.getConfigurationSection("realms." + name + ".banned") != null) {
+                for (String s : config.getConfigurationSection("realms." + name + ".banned").getKeys(false)) {
+                    if (RealmPlayer.getPlayer(s) == null)
+                        new RealmPlayer(s, config.getString("realms." + name + ".banned." + s + ".name"));
+                    RealmPlayer bannedPlayer = RealmPlayer.getPlayer(s);
+                    if (bannedPlayer != null) realm.banPlayer(bannedPlayer);
+                }
+            }
+        } catch (Exception ex) {
+            Main.getInstance().getLogger().log(java.util.logging.Level.WARNING, "Failed to load realm: " + name, ex);
         }
     }
 
@@ -222,27 +236,35 @@ public class RealmConfig {
     public void loadAllRealm() {
 
         if (config.getConfigurationSection("realms") != null) {
-            try {
-                for (String s : config.getConfigurationSection("realms").getKeys(false)) {
+            for (String s : config.getConfigurationSection("realms").getKeys(false)) {
+                try {
                     loadRealm(s);
+                } catch (Exception ex) {
+                    Main.getInstance().getLogger().log(java.util.logging.Level.WARNING, "Skipping invalid realm: " + s, ex);
                 }
+            }
+            try {
                 loadNewRealmPlayer();
                 for (String s : config.getConfigurationSection("realmplayers").getKeys(false)) {
-                    RealmPlayer.getPlayer(s).setLastvote(config.getLong("realmplayers." + s + ".lastvote"));
-                    for (String sr : config.getStringList("realmplayers." + s + ".voted")) {
-                        if (sr != null) {
-                            RealmPlayer.getPlayer(s).addRealmVoted(RealmPlayer.getPlayer(sr).getOwned());
+                    RealmPlayer rp = RealmPlayer.getPlayer(s);
+                    if (rp != null) {
+                        rp.setLastvote(config.getLong("realmplayers." + s + ".lastvote"));
+                        for (String sr : config.getStringList("realmplayers." + s + ".voted")) {
+                            if (sr != null) {
+                                RealmPlayer votedPlayer = RealmPlayer.getPlayer(sr);
+                                if (votedPlayer != null && votedPlayer.getOwned() != null) {
+                                    rp.addRealmVoted(votedPlayer.getOwned());
+                                }
+                            }
                         }
                     }
-
                 }
-                Main.getInstance().getLogger().info("Succefully loaded all realms !");
+                Main.getInstance().getLogger().info("Successfully loaded all realms !");
             } catch (Exception ex) {
-                Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Failed to load all realms", ex);
+                Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Failed to load realm players", ex);
             }
         }
     }
-
     public void removeVotes(Realm deletedrealm) {
 
         String deletedName = deletedrealm.getOwner().getUniqueId();

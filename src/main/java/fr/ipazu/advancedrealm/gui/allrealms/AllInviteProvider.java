@@ -57,7 +57,7 @@ public class AllInviteProvider implements InventoryProvider {
     public void init(Player player, InventoryContents inventoryContents) {
         Pagination pagination = inventoryContents.pagination();
         int i = 1;
-        ClickableItem basic = ClickableItem.of(new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1, (byte) 15), e -> e.setCancelled(true));
+        ClickableItem basic = ClickableItem.of(new ItemStack(Material.AIR), e -> e.setCancelled(true));
         if (realmPlayer.getAllRealm().size() <= 9)
             inventoryContents.fill(basic);
         if(realmPlayer.getOwned() != null){
@@ -69,6 +69,7 @@ public class AllInviteProvider implements InventoryProvider {
             ClickableItem cl = ClickableItem.of(ItemsUtils.getHead(r.getOwner().getName(), "§bInvite to " + r.getOwner().getName() + "'s Realm.",
                     Arrays.asList("§7# of members §6" + r.getRealmMembers().size() + "§7/§6" + r.getLevel().getMaxplayer(), "§7Privacy: §6" + r.getPrivacyString())), e -> {
                 e.setCancelled(true);
+                player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
                 if(player.getName().equalsIgnoreCase(visedplayer.getName())){
                     player.sendMessage("You cannot invite yourself.");
                     player.closeInventory();
@@ -145,7 +146,7 @@ public class AllInviteProvider implements InventoryProvider {
     public void placeIfVoid(ClickableItem clickableItem, InventoryContents inventoryContents) {
         SlotIterator iterator = inventoryContents.newIterator(SlotIterator.Type.HORIZONTAL, 0, 0);
         while (!iterator.ended()) {
-            if (!iterator.get().isPresent() || iterator.get().get().getItem().getType() == Material.GRAY_STAINED_GLASS_PANE && iterator.get().isPresent()) {
+            if (!iterator.get().isPresent() || iterator.get().get().getItem().getType() == Material.AIR) {
                 inventoryContents.set(iterator.row(), iterator.column(), clickableItem);
                 return;
             }

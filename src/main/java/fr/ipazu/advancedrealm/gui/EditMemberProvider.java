@@ -1,5 +1,6 @@
 package fr.ipazu.advancedrealm.gui;
 
+import fr.ipazu.advancedrealm.Main;
 import fr.ipazu.advancedrealm.realm.Realm;
 import fr.ipazu.advancedrealm.realm.RealmPlayer;
 import fr.ipazu.advancedrealm.realm.RealmRank;
@@ -11,7 +12,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,7 +21,7 @@ public class EditMemberProvider implements InventoryProvider {
     private Realm realm;
     private Player player;
     private RealmPlayer realmplayer;
-    private ClickableItem ban,kick,member,guard,manager,basic,retour;
+    private ClickableItem ban,kick,member,guard,manager,retour;
 
     public EditMemberProvider(Player player, Realm realm,RealmPlayer vised) {
         this.player = player;
@@ -34,6 +34,7 @@ public class EditMemberProvider implements InventoryProvider {
     private void setUpItems() {
         ban = ClickableItem.of(new ItemsUtils(Material.BARRIER, "§4Ban "+vised.getName(), Collections.singletonList("§7Ban " + vised.getName() + " from this realm")).toItemStack(), e -> {
             e.setCancelled(true);
+            player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
             player.closeInventory();
             if(realmplayer.getRankByRealm(realm) == RealmRank.MEMBER || realmplayer.getRankByRealm(realm) == RealmRank.GUARD){
                 player.sendMessage("§cYou don't have the required rank to ban this player of the realm.");
@@ -57,6 +58,7 @@ public class EditMemberProvider implements InventoryProvider {
 
         kick = ClickableItem.of(ItemsUtils.getColoredArmor(Material.LEATHER_BOOTS, Color.RED, "§cKick "+vised.getName(), Collections.singletonList("§7Kick " + vised.getName() + " from this realm")), e -> {
             e.setCancelled(true);
+            player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
             player.closeInventory();
             if(realmplayer.getRankByRealm(realm) == RealmRank.MEMBER || realmplayer.getRankByRealm(realm) == RealmRank.GUARD){
                 player.sendMessage("§cYou don't have the required rank to kick this player of the realm.");
@@ -81,6 +83,7 @@ public class EditMemberProvider implements InventoryProvider {
         member = ClickableItem.of(new ItemsUtils(Material.COBBLESTONE, "§bMember",
                 Arrays.asList("§7Member Permissions:","","§7-§e Can't open chests")).toItemStack(), e -> {
             e.setCancelled(true);
+            player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
             e.getWhoClicked().closeInventory();
             if(realmplayer.getRankByRealm(realm) == RealmRank.MEMBER || realmplayer.getRankByRealm(realm) == RealmRank.GUARD){
                 player.sendMessage("§cYou don't have the required rank to edit the permissions of this player.");
@@ -104,6 +107,7 @@ public class EditMemberProvider implements InventoryProvider {
         guard = ClickableItem.of(new ItemsUtils(Material.LAPIS_ORE, "§bGuard",
                 Arrays.asList("§7Guard Permissions:","","§7-§e Can build without any restrictions","§7-§e Can break without any restrictions","§7-§e Can interact without any restrictions")).toItemStack(), e -> {
             e.setCancelled(true);
+            player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
             e.getWhoClicked().closeInventory();
             if(realmplayer.getRankByRealm(realm) == RealmRank.MEMBER || realmplayer.getRankByRealm(realm) == RealmRank.GUARD){
                 player.sendMessage("§cYou don't have the required rank to edit the permissions of this player.");
@@ -128,6 +132,7 @@ public class EditMemberProvider implements InventoryProvider {
                 Arrays.asList("§7Manager Permissions:","","§7-§e Can build without any restrictions","§7-§e Can break without any restrictions","§7-§e Can interact without any restrictions"
                         ,"§7-§e Can kick other members from Realm","§7-§e Can ban other members from Realm","§7-§e Can promote other members from Realm","§7-§e Can invite other members from Realm","§7-§e Can change Realm's privacy")).toItemStack(), e -> {
             e.setCancelled(true);
+            player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
             e.getWhoClicked().closeInventory();
             if(realmplayer.getRankByRealm(realm) == RealmRank.MEMBER || realmplayer.getRankByRealm(realm) == RealmRank.GUARD){
                 player.sendMessage("§cYou don't have the required rank to edit the permissions of this player.");
@@ -150,16 +155,15 @@ public class EditMemberProvider implements InventoryProvider {
         });
         retour = ClickableItem.of(new ItemsUtils(Material.RED_BED,"⬅ §bGo back",Arrays.asList("","§7Click to go back to the","§7Realm options.")).toItemStack(),e ->{
             e.setCancelled(true);
+            player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
             player.closeInventory();
             new WholeGUI().openMembersGui(player,realm);
         });
-        basic = ClickableItem.of(new ItemStack(Material.GRAY_STAINED_GLASS_PANE,1,(byte) 15), e -> e.setCancelled(true));
     }
 
 
     @Override
     public void init(Player player, InventoryContents inventoryContents) {
-        inventoryContents.fill(basic);
         inventoryContents.set(1,2,member);
         inventoryContents.set(1,4,guard);
         inventoryContents.set(1,6,manager);

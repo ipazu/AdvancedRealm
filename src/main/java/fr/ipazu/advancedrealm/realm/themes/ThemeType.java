@@ -1,5 +1,6 @@
 package fr.ipazu.advancedrealm.realm.themes;
 import fr.ipazu.advancedrealm.Main;
+import fr.ipazu.advancedrealm.utils.Config;
 import fr.ipazu.advancedrealm.utils.ItemsUtils;
 import fr.ipazu.advancedrealm.utils.SchematicUtils;
 import org.bukkit.Bukkit;
@@ -59,7 +60,7 @@ public class ThemeType {
         return nblock;
     }
     public ItemStack getItem(){
-        return new ItemsUtils(Material.getMaterial(id),itemname,durability,lore).toItemStack();
+        return new ItemsUtils(Config.getMaterial(id),itemname,durability,lore).toItemStack();
     }
 
     public String getName() {

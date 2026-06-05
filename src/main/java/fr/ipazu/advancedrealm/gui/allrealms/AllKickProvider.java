@@ -51,12 +51,13 @@ public class AllKickProvider implements InventoryProvider {
     public void init(Player player, InventoryContents inventoryContents) {
         Pagination pagination = inventoryContents.pagination();
         int i = 1;
-        ClickableItem basic = ClickableItem.of(new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1, (byte) 15), e -> e.setCancelled(true));
+        ClickableItem basic = ClickableItem.of(new ItemStack(Material.AIR), e -> e.setCancelled(true));
         if (realmPlayer.getAllRealm().size() <= 9)
             inventoryContents.fill(basic);
         for (Realm r : avaiblerealms) {
             ClickableItem kick = ClickableItem.of(ItemsUtils.getHead(r.getOwner().getName(),"§bKick from "+r.getOwner().getName()+"'s Realm.",Arrays.asList("§7# of members §6" + r.getRealmMembers().size() + "§7/§6" + r.getLevel().getMaxplayer(), "§7Privacy: §6" + r.getPrivacyString())), e -> {
                 e.setCancelled(true);
+                player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
                 player.closeInventory();
                 if(realmPlayer.getRankByRealm(r) == RealmRank.MEMBER || realmPlayer.getRankByRealm(r) == RealmRank.GUARD){
                     player.sendMessage("§cYou don't have the required rank to kick this player of the realm.");
@@ -115,7 +116,7 @@ public class AllKickProvider implements InventoryProvider {
     public void placeIfVoid(ClickableItem clickableItem, InventoryContents inventoryContents) {
         SlotIterator iterator = inventoryContents.newIterator(SlotIterator.Type.HORIZONTAL, 0, 0);
         while (!iterator.ended()) {
-            if (!iterator.get().isPresent() || iterator.get().get().getItem().getType() == Material.GRAY_STAINED_GLASS_PANE && iterator.get().isPresent()) {
+            if (!iterator.get().isPresent() || iterator.get().get().getItem().getType() == Material.AIR) {
                 inventoryContents.set(iterator.row(), iterator.column(), clickableItem);
                 return;
             }
