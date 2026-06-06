@@ -83,11 +83,13 @@ public enum Config {
         newstring = newstring.replace("%realm_privacy%",r.getPrivacyString());
         newstring = newstring.replace("%realm_bordersize%",r.getLevel().getBordersize()+"");
         newstring = newstring.replace("%realm_maxplayer%",r.getLevel().getMaxplayer()+"");
+        newstring = newstring.replace("%realm_level%",r.getLevel().getNumber()+"");
         RealmLevel nextlevel = RealmLevel.getLevel(r.getLevel().getNumber() + 1);
         if(nextlevel != null){
             newstring = newstring.replace("%realm_nextbordersize%",nextlevel.getBordersize()+"");
             newstring = newstring.replace("%realm_nextmaxplayer%",nextlevel.getMaxplayer()+"");
             newstring = newstring.replace("%realm_nextlevelcost%",nextlevel.getPrice()+"");
+            newstring = newstring.replace("%realm_nextlevel%",nextlevel.getNumber()+"");
         }
 
         return newstring;
