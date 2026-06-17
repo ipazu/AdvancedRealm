@@ -1,6 +1,7 @@
 package fr.ipazu.advancedrealm.realm;
 
 
+import fr.ipazu.advancedrealm.Main;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -33,11 +34,15 @@ public class RealmLevel {
         return number;
     }
     public static RealmLevel getLevel(int level){
-      return realmlevel.get(level);
+      RealmLevel rl = realmlevel.get(level);
+      if (rl == null) {
+          rl = realmlevel.get(1);
+      }
+      return rl;
     }
     private void useless()
     {
         ArrayList<String> strs = new ArrayList<>();
-        strs.forEach(System.out::println);
+        strs.forEach(s -> Main.getInstance().getLogger().info(s));
     }
 }

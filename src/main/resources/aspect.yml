@@ -1,7 +1,27 @@
 gui:
+  upgradeconfirm:
+    info:
+      item: EXPERIENCE_BOTTLE
+      name: "&b&lUpgrade Confirmation"
+      lore:
+        - "&7Current level: &e%realm_level%"
+        - "&7Next level: &e%realm_nextlevel%"
+        - ""
+        - "&7Cost: &6$%realm_nextlevelcost%"
+    confirm:
+      item: GREEN_TERRACOTTA
+      name: "&aConfirm Upgrade"
+      lore:
+        - "&7Click to confirm upgrading"
+        - "&7your Realm to level &e%realm_nextlevel%"
+    cancel:
+      item: RED_TERRACOTTA
+      name: "&cCancel"
+      lore:
+        - "&7Go back to Realm options."
   realmgui:
     home:
-      item: dark_oak_door_item
+      item: DARK_OAK_DOOR
       data: 0
       name: "&bTeleport to Realm"
       slot: 11
@@ -10,7 +30,7 @@ gui:
         - "&7Teleport to %realm_name%'s Realm."
       clickmessage: "&aTeleporting to the realm..."
     privacy:
-      item: wood_sword
+      item: WOODEN_SWORD
       data: 0
       name: "&bToogle Privacy: &3%realm_privacy%"
       slot: 13
@@ -21,7 +41,7 @@ gui:
         - "&cPrivate &8- &7No one can visit your Realm."
       clickmessage: "&aRealm visibility succefully changed to &b%realm_privacy%"
     banned:
-      item: barrier
+      item: BARRIER
       data: 0
       name: "&bBanned Players"
       slot: 33
@@ -29,7 +49,7 @@ gui:
         - ""
         - "&7View and manage players that have been banned from this Realm."
     members:
-      item: skull_item
+      item: PLAYER_HEAD
       data: 3
       name: "&bMembers"
       slot: 31
@@ -37,7 +57,7 @@ gui:
         - ""
         - "&7View and manage the members of this realm."
     theme:
-      item: painting
+      item: PAINTING
       data: 0
       name: "&bSpawn Themes"
       slot: 29
@@ -45,7 +65,7 @@ gui:
         - ""
         - "&7Customize your Realms spawn point with different themes."
     upgrade:
-      item: dirt
+      item: DIRT
       data: 0
       name: "&bUpgrade Build Size"
       slot: 15
@@ -76,7 +96,7 @@ gui:
         - ""
         - "&eClick to edit %player_name%'s permissions."
   back:
-    item: bed
+    item: RED_BED
     data: 0
     name: "⬅ &bGo back"
     slot: 45
@@ -85,15 +105,23 @@ gui:
         - "&7Click to go back to the"
         - "&7Realm options."
   default:
-    item: stained_glass_pane
+    item: BLACK_STAINED_GLASS_PANE
     data: 15
 messages:
+  upgrade:
+    maxlevel: "&cThis realm is already at max level."
+    unavailable: "&cThis feature is currently unavailable."
+    noperm: "&cOnly the manager and the owner of the Realm can do this !"
+    notenoughmoney: "&cYou don't have enough money to upgrade your Realm."
+    balanceinfo: "&cYou have &6%balance% &cand you need &6%cost%"
+    successbroadcast: "&e&l%player% &aupgraded &b&l%owner%'s &aRealm to the level &e%level%"
+  interact:
   interact:
     nobuild: "&cYou don't have the permission to build here"
     nobreak: "&cYou don't have the permission to break here"
     nointeract: "&cYou don't have the permission to interact in this realm"
     nochest: "&cYou don't have the permission to open the chests of this realm"
-    notinrealm: "&cYou are not in this realm"
+    notinrealm: "&cYou cannot do that!"
   realmcommands:
       invite:
         selfinvite: "&cYou cannot invite yourself !"

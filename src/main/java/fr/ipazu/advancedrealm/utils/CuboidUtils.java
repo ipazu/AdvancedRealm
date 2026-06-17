@@ -161,7 +161,7 @@ public class CuboidUtils implements Cloneable, ConfigurationSerializable, Iterab
 
             return new CuboidUtils(worldName, xPos1, yPos1, zPos1, xPos2, yPos2, zPos2);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            java.util.logging.Logger.getLogger("CuboidUtils").log(java.util.logging.Level.SEVERE, "Failed to deserialize cuboid", ex);
             return null;
         }
     }

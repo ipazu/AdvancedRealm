@@ -23,13 +23,13 @@ public class ThemeConfig {
          String itemname = config.getString("themes."+name+".item.name");
          String material = config.getString("themes."+name+".item.material");
          String permission = config.getString("themes."+name+".permission");
-         if(Material.getMaterial(material) == null){
-             System.out.println("Wrong material for the theme: "+ name+" , switched to dirt");
-             material = "Dirt";
-         }
+          if(Material.getMaterial(material) == null){
+              Main.getInstance().getLogger().warning("Wrong material for the theme: \""+ name+"\", using Grass as default");
+              material = "GRASS";
+          }
          List<String> lore = config.getStringList("themes."+name+".item.lore");
          new ThemeType(name,path,permission,nblock,itemname,material,durability,lore);
-         System.out.println("\""+name+"\" loaded !");
+          Main.getInstance().getLogger().info("\""+name+"\" loaded !");
 
      }
      public void loadAllThemes(){
@@ -42,6 +42,6 @@ public class ThemeConfig {
     private void useless()
     {
         ArrayList<String> strs = new ArrayList<>();
-        strs.forEach(System.out::println);
+        strs.forEach(s -> Main.getInstance().getLogger().info(s));
     }
 }

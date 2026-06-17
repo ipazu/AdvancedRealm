@@ -32,7 +32,7 @@ public class AllRealmProvider implements InventoryProvider {
     public void init(Player player, InventoryContents inventoryContents) {
         Pagination pagination = inventoryContents.pagination();
         int i = 0;
-        ClickableItem basic = ClickableItem.of(new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15), e -> e.setCancelled(true));
+        ClickableItem basic = ClickableItem.of(new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1, (byte) 15), e -> e.setCancelled(true));
         if (realmPlayer.getAllRealm().size() <= 27)
             inventoryContents.fill(basic);
         List<Realm> realms = realmPlayer.getAllRealm();
@@ -41,15 +41,16 @@ public class AllRealmProvider implements InventoryProvider {
             realms.add(0,realmPlayer.getOwned());
         }
         for (Realm r : realms) {
-            ClickableItem cl = ClickableItem.of(new ItemsUtils(Material.DARK_OAK_DOOR_ITEM
+            ClickableItem cl = ClickableItem.of(new ItemsUtils(Material.DARK_OAK_DOOR
                     , "§b" + r.getOwner().getName() + "'s Realm."
                     , Arrays.asList("§7Rank: " + realmPlayer.getRankByRealm(r).getColor() + realmPlayer.getRankByRealm(r).toString(), "§7Privacy: §6" + r.getPrivacyString(), "§7# of members §6" + r.getRealmMembers().size() + "§7/§6" + r.getLevel().getMaxplayer())).toItemStack(), e -> {
                 e.setCancelled(true);
+                player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
                 player.closeInventory();
                 new WholeGUI().openRealmGui(player, r,true);
             });
             if (realmPlayer.getOwned() == r) {
-                cl.getItem().setType(Material.BED);
+                cl.getItem().setType(Material.RED_BED);
             }
             if (realmPlayer.getAllRealm().size() <= 27)
                 placeIfVoid(cl, inventoryContents);
@@ -91,7 +92,7 @@ public class AllRealmProvider implements InventoryProvider {
     public void placeIfVoid(ClickableItem clickableItem, InventoryContents inventoryContents) {
         SlotIterator iterator = inventoryContents.newIterator(SlotIterator.Type.HORIZONTAL, 0, 0);
         while (!iterator.ended()) {
-            if (iterator.get().isPresent() && iterator.get().get().getItem().getType() == Material.STAINED_GLASS_PANE) {
+            if (iterator.get().isPresent() && iterator.get().get().getItem().getType() == Material.GRAY_STAINED_GLASS_PANE) {
                 inventoryContents.set(iterator.row(), iterator.column(), clickableItem);
                 return;
             }

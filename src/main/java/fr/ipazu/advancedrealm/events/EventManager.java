@@ -1,6 +1,7 @@
 package fr.ipazu.advancedrealm.events;
 
 
+import fr.ipazu.advancedrealm.utils.ChestConfigListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -18,5 +19,6 @@ public class EventManager {
         pm.registerEvents(new JoinEvent(),this.plugin);
         pm.registerEvents(new InterractEvent(),this.plugin);
         pm.registerEvents(new PerkEvent(),this.plugin);
+        pm.registerEvents(new ChestConfigListener(),this.plugin);
     }
 }

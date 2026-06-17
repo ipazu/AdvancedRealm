@@ -1,6 +1,7 @@
 package fr.ipazu.advancedrealm.gui;
 
 
+import fr.ipazu.advancedrealm.Main;
 import fr.ipazu.advancedrealm.realm.Realm;
 import fr.ipazu.advancedrealm.utils.ItemsUtils;
 import fr.minuskube.inv.ClickableItem;
@@ -52,13 +53,14 @@ public class TopProvider implements InventoryProvider {
         Pagination pagination = inventoryContents.pagination();
         int i = 0;
         int rank = 1;
-        ClickableItem basic = ClickableItem.of(new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15), e -> e.setCancelled(true));
+        ClickableItem basic = ClickableItem.of(new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1, (byte) 15), e -> e.setCancelled(true));
         if (Realm.allrealm.size() <= 9 * 4) {
             inventoryContents.fill(basic);
         }
         for (Realm r : getTopArray()) {
             ClickableItem cl = ClickableItem.of(ItemsUtils.getHead(r.getOwner().getName(), "§e" + r.getOwner().getName(), Arrays.asList("", "§7Rank: §d" + rank, "§7Votes: §e" + r.getVote(), "", "§eClick to visit")), e -> {
                 e.setCancelled(true);
+                player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
                 player.closeInventory();
                 player.performCommand("visit " + r.getOwner().getName());
             });
@@ -136,7 +138,7 @@ public class TopProvider implements InventoryProvider {
     public void placeIfVoid(ClickableItem clickableItem, InventoryContents inventoryContents) {
         SlotIterator iterator = inventoryContents.newIterator(SlotIterator.Type.HORIZONTAL, 0, 0);
         while (!iterator.ended()) {
-            if (iterator.get().isPresent() && iterator.get().get().getItem().getType() == Material.STAINED_GLASS_PANE) {
+            if (iterator.get().isPresent() && iterator.get().get().getItem().getType() == Material.GRAY_STAINED_GLASS_PANE) {
                 inventoryContents.set(iterator.row(), iterator.column(), clickableItem);
                 return;
             }

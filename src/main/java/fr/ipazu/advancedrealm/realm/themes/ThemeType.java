@@ -1,7 +1,9 @@
 package fr.ipazu.advancedrealm.realm.themes;
 import fr.ipazu.advancedrealm.Main;
+import fr.ipazu.advancedrealm.utils.Config;
 import fr.ipazu.advancedrealm.utils.ItemsUtils;
 import fr.ipazu.advancedrealm.utils.SchematicUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -40,13 +42,16 @@ public class ThemeType {
         }
 
         public void pasteTheme(Location spawn) {
+            if (Bukkit.getPluginManager().getPlugin("WorldEdit") == null) {
+                Main.getInstance().getLogger().warning("WorldEdit not found. Install WorldEdit to enable theme pasting.");
+                return;
+            }
             try {
                 File file = new File(Main.getInstance().getDataFolder(), this.schematic);
                 new SchematicUtils(spawn,file).paste();
 
             } catch (Exception e) {
-                System.out.println("§c[AdvancedRealm] failed to load schematic, an error occured , please try to reinstall the plugin or call @iPazu#3982 on discord \n cause: " + e.getCause() + "\n trace:");
-                e.printStackTrace();
+                Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Failed to load schematic", e);
             }
 
         }
@@ -55,7 +60,7 @@ public class ThemeType {
         return nblock;
     }
     public ItemStack getItem(){
-        return new ItemsUtils(Material.getMaterial(id),itemname,durability,lore).toItemStack();
+        return new ItemsUtils(Config.getMaterial(id),itemname,durability,lore).toItemStack();
     }
 
     public String getName() {
@@ -68,6 +73,6 @@ public class ThemeType {
     private void useless()
     {
         ArrayList<String> strs = new ArrayList<>();
-        strs.forEach(System.out::println);
+        strs.forEach(s -> Main.getInstance().getLogger().info(s));
     }
 }

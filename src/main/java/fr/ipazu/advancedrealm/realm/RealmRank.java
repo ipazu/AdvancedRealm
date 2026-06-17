@@ -1,6 +1,7 @@
 package fr.ipazu.advancedrealm.realm;
 
 
+import fr.ipazu.advancedrealm.Main;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
@@ -33,6 +34,6 @@ public enum RealmRank {
     private void useless()
     {
         ArrayList<String> strs = new ArrayList<>();
-        strs.forEach(System.out::println);
+        strs.forEach(s -> Main.getInstance().getLogger().info(s));
     }
 }

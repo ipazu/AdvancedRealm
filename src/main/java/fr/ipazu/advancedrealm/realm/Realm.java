@@ -1,6 +1,5 @@
 package fr.ipazu.advancedrealm.realm;
 
-import com.boydti.fawe.util.TaskManager;
 import fr.ipazu.advancedrealm.Main;
 import fr.ipazu.advancedrealm.realm.themes.Theme;
 import fr.ipazu.advancedrealm.realm.themes.ThemeType;
@@ -16,6 +15,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +45,7 @@ public class Realm {
         rp.setOwned(this);
     }
     public void addPlayer(RealmPlayer p) {
+        if (p == null) return;
         if (!(realmmembers.size() >= level.getMaxplayer())) {
             realmmembers.add(p);
             p.addRealm(this);
@@ -66,7 +67,12 @@ public class Realm {
     public void teleportToSpawn(Player player) {
         player.setFallDistance(0);
         player.teleport(theme.getSpawn().clone().add(0.5, 1, 0.5));
-        sendWorldBorderPacket(player);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                sendWorldBorderPacket(player);
+            }
+        }.runTaskLater(Main.getInstance(), 2);
     }
 
     public void sendBorderToAll() {
@@ -79,9 +85,7 @@ public class Realm {
     }
 
     public Location getCenter() {
-        int i = level.getBordersize() - RealmLevel.getLevel(1).getBordersize();
-        Location center = theme.getSpawn().clone().add(0, 0, i + theme.getThemeType().getNblock() - 4.5 * level.getNumber());
-        return center;
+        return theme.getSpawn().clone().add(0, 0, 0);
     }
 
     public void sendWorldBorderPacket(Player player) {
@@ -143,12 +147,12 @@ public class Realm {
             if (fromloc.getType() == Material.CHEST) {
                 Chest chest = (Chest) fromloc.getState();
                 if (ConfigFiles.getRealmchest() == null) {
-                    chest.getBlockInventory().setItem(2, new ItemStack(Material.CARROT_ITEM));
+                    chest.getBlockInventory().setItem(2, new ItemStack(Material.CARROT));
                     chest.getBlockInventory().setItem(3, new ItemStack(Material.SUGAR_CANE));
-                    chest.getBlockInventory().setItem(5, new ItemStack(Material.MELON_STEM));
+                    chest.getBlockInventory().setItem(5, new ItemStack(Material.MELON));
                     chest.getBlockInventory().setItem(6, new ItemStack(Material.ICE));
                     chest.getBlockInventory().setItem(13, new ItemStack(Material.TORCH, 8));
-                    chest.getBlockInventory().setItem(20, new ItemStack(Material.POTATO_ITEM));
+                    chest.getBlockInventory().setItem(20, new ItemStack(Material.POTATO));
                     chest.getBlockInventory().setItem(21, new ItemStack(Material.CACTUS));
                     chest.getBlockInventory().setItem(23, new ItemStack(Material.PUMPKIN));
                     chest.getBlockInventory().setItem(24, new ItemStack(Material.LAVA_BUCKET));
@@ -171,12 +175,15 @@ public class Realm {
     }
 
     public void pasteIsland() {
+        if (Bukkit.getPluginManager().getPlugin("WorldEdit") == null) {
+            Main.getInstance().getLogger().warning("WorldEdit not found. Install WorldEdit to enable schematic pasting.");
+            return;
+        }
         try {
             File file = new File(Main.getInstance().getDataFolder(), "island.schematic");
             new SchematicUtils(theme.getSpawn(),file).paste();
             } catch (Exception e) {
-            System.out.println("§c[AdvancedRealm] failed to load schematic, an error occured , please try to reinstall the plugin or call @iPazu#3982 on discord \n cause: " + e.getCause() + "\n trace:");
-            e.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Failed to load schematic", e);
         }
 
     }
@@ -253,6 +260,9 @@ public class Realm {
 
     public void setLevel(int i) {
         level = RealmLevel.getLevel(i);
+        if (level == null) {
+            level = RealmLevel.getLevel(1);
+        }
     }
 
     public void addVote() {
@@ -290,7 +300,7 @@ public class Realm {
 
     private void useless() {
         ArrayList<String> strs = new ArrayList<>();
-        strs.forEach(System.out::println);
+        strs.forEach(s -> Main.getInstance().getLogger().info(s));
     }
 }
 

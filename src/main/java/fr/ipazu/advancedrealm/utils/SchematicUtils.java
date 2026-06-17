@@ -1,15 +1,20 @@
 package fr.ipazu.advancedrealm.utils;
 
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.util.TaskManager;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.extent.clipboard.ClipboardFormats;
-import fr.ipazu.advancedrealm.Main;
-import org.bukkit.Bukkit;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import org.bukkit.Location;
+
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.io.FileInputStream;
 
 public class SchematicUtils {
     private Location location;
@@ -21,36 +26,23 @@ public class SchematicUtils {
     }
 
     public void paste() throws Exception {
-        if (Bukkit.getVersion().contains("1.14")  ) {
-            paste14();
-        } else if (Bukkit.getVersion().contains("1.13")) {
-            paste13();
-        } else
-            pasteLegacy();
-    }
+        com.sk89q.worldedit.world.World adaptedWorld = BukkitAdapter.adapt(location.getWorld());
+        ClipboardFormat format = ClipboardFormats.findByFile(file);
+        if (format == null) {
+            throw new Exception("No clipboard format found for file: " + file.getName());
+        }
+        Clipboard clipboard;
+        try (ClipboardReader reader = format.getReader(new FileInputStream(file))) {
+            clipboard = reader.read();
+        }
 
-    private void pasteLegacy()  {
-        TaskManager.IMP.async(() -> {
-            Vector vector = new Vector(location.getX(), location.getY(), location.getZ());
-            try {
-                ClipboardFormats.findByFile(file).load(file).paste(FaweAPI.getWorld(location.getWorld().getName()), vector, true, false, null);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
-    }
-
-    private void paste13() throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
-        Class<?> wrapperclass = Main.wrapperclass;
-        wrapperclass.getMethod("paste",File.class,Location.class).invoke(wrapperclass.newInstance(),file,location);
-        System.out.println("Pasting 1.13");
-    }
-
-    private void paste14() throws Exception {
-        Class<?> wrapperclass = Main.wrapperclass;
-        wrapperclass.getMethod("paste14",File.class,Location.class).invoke(wrapperclass.newInstance(),file,location);
-        System.out.println("Pasting 1.14");
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(adaptedWorld)) {
+            Operation operation = new ClipboardHolder(clipboard)
+                    .createPaste(editSession)
+                    .to(BlockVector3.at(location.getX(), location.getY(), location.getZ()))
+                    .ignoreAirBlocks(true)
+                    .build();
+            Operations.complete(operation);
+        }
     }
 }
-

@@ -40,8 +40,7 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception e) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            e.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", e);
         }
 
     }
@@ -51,8 +50,7 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception e) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            e.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", e);
         }
     }
 
@@ -61,8 +59,7 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception e) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            e.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", e);
         }
     }
 
@@ -71,8 +68,7 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception e) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            e.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", e);
         }
     }
 
@@ -84,8 +80,7 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception e) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            e.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", e);
         }
     }
 
@@ -94,8 +89,7 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception e) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            e.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", e);
         }
     }
 
@@ -105,8 +99,7 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception ex) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            ex.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", ex);
         }
 
         if (RealmPlayer.getPlayer(p.getUniqueId().toString()) == null)
@@ -119,8 +112,7 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception ex) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            ex.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", ex);
         }
     }
 
@@ -129,8 +121,7 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception ex) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            ex.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", ex);
         }
     }
 
@@ -142,8 +133,16 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception ex) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            ex.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", ex);
+        }
+    }
+
+    public void setLevel(Realm realm) {
+        config.set("realms." + realm.getOwner().getUniqueId() + ".level", realm.getLevel().getNumber());
+        try {
+            config.save(file);
+        } catch (Exception ex) {
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", ex);
         }
     }
 
@@ -155,7 +154,6 @@ public class RealmConfig {
             }
             config.set("realms." + r.getOwner().getUniqueId() + ".players." + rp.getUniqueId() + ".name", player.getName());
             rp.setName(player.getName());
-
         }
         for (String s : config.getConfigurationSection("realmplayers").getKeys(false)) {
             if (player.getUniqueId().toString().equals(s))
@@ -164,10 +162,68 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception ex) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            ex.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", ex);
         }
         rp.setName(player.getName());
+    }
+
+    public void updateLastVote(RealmPlayer rp) {
+        config.set("realmplayers." + rp.getUniqueId() + ".lastvote", System.currentTimeMillis());
+        rp.setLastvote(System.currentTimeMillis());
+        try {
+            config.save(file);
+        } catch (Exception ex) {
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", ex);
+        }
+    }
+
+    public void loadRealm(String name) {
+        try {
+            if (config.getConfigurationSection("realms." + name + ".players") != null) {
+                for (String s : config.getConfigurationSection("realms." + name + ".players").getKeys(false)) {
+                    if (RealmPlayer.getPlayer(s) == null)
+                        new RealmPlayer(s, config.getString("realms." + name + ".players." + s + ".name"));
+                }
+            }
+            Location spawn = new Location(ConfigFiles.getWorld(),
+                config.getInt("realms." + name + ".theme.spawn.x"),
+                config.getInt("realms." + name + ".theme.spawn.y"),
+                config.getInt("realms." + name + ".theme.spawn.z"),
+                (float) config.getInt("realms." + name + ".theme.spawn.yaw"),
+                (float) config.getInt("realms." + name + ".theme.spawn.pitch"));
+            ThemeType themeType = ThemeType.themeTypes.get(config.getString("realms." + name + ".theme.id"));
+            if (themeType == null) {
+                themeType = ThemeType.allthemeTypes.isEmpty() ? null : ThemeType.allthemeTypes.get(0);
+            }
+            String ownerUuid = config.getString("realms." + name + ".owner.uuid");
+            if (ownerUuid != null && RealmPlayer.getPlayer(ownerUuid) == null) {
+                new RealmPlayer(ownerUuid, config.getString("realms." + name + ".owner.name"));
+            }
+            RealmPlayer owner = ownerUuid != null ? RealmPlayer.getPlayer(ownerUuid) : null;
+            if (owner == null) return;
+            Realm realm = new Realm(owner, themeType, spawn, Math.max(1, config.getInt("realms." + name + ".level")), Math.max(0, config.getInt("realms." + name + ".vote")));
+            if (config.getConfigurationSection("realms." + name + ".players") != null) {
+                for (String s : config.getConfigurationSection("realms." + name + ".players").getKeys(false)) {
+                    RealmPlayer rp = RealmPlayer.getPlayer(s);
+                    if (rp != null && rp.getOwned() != realm) {
+                        realm.addPlayer(rp);
+                        realm.promote(rp, RealmRank.getRankByString(config.getString("realms." + name + ".players." + s + ".rank")));
+                    }
+                }
+            }
+            realm.setPrivacy(config.getBoolean("realms." + name + ".privacy"));
+            realm.setPerk(config.getString("realms."+name+".perk"));
+            if (config.getConfigurationSection("realms." + name + ".banned") != null) {
+                for (String s : config.getConfigurationSection("realms." + name + ".banned").getKeys(false)) {
+                    if (RealmPlayer.getPlayer(s) == null)
+                        new RealmPlayer(s, config.getString("realms." + name + ".banned." + s + ".name"));
+                    RealmPlayer bannedPlayer = RealmPlayer.getPlayer(s);
+                    if (bannedPlayer != null) realm.banPlayer(bannedPlayer);
+                }
+            }
+        } catch (Exception ex) {
+            Main.getInstance().getLogger().log(java.util.logging.Level.WARNING, "Failed to load realm: " + name, ex);
+        }
     }
 
     private void loadNewRealmPlayer() {
@@ -177,79 +233,38 @@ public class RealmConfig {
         }
     }
 
-    public void updateLastVote(RealmPlayer rp) {
-        config.set("realmplayers." + rp.getUniqueId() + ".lastvote", System.currentTimeMillis());
-        rp.setLastvote(System.currentTimeMillis());
-        try {
-            config.save(file);
-        } catch (Exception ex) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            ex.printStackTrace();
-        }
-    }
-
-    public void setLevel(Realm realm) {
-        config.set("realms." + realm.getOwner().getUniqueId() + ".level", realm.getLevel().getNumber());
-        try {
-            config.save(file);
-        } catch (Exception ex) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            ex.printStackTrace();
-        }
-    }
-
-    public void loadRealm(String name) {
-        for (String s : config.getConfigurationSection("realms." + name + ".players").getKeys(false)) {
-            if (RealmPlayer.getPlayer(s) == null)
-                new RealmPlayer(s, config.getString("realms." + name + ".players." + s + ".name"));
-        }
-        Location spawn = new Location(ConfigFiles.getWorld(), config.getInt("realms." + name + ".theme.spawn.x"), config.getInt("realms." + name + ".theme.spawn.y"), config.getInt("realms." + name + ".theme.spawn.z"), (float) config.getInt("realms." + name + ".theme.spawn.yaw"), (float) config.getInt("realms." + name + ".theme.spawn.pitch"));
-        Realm realm = new Realm(RealmPlayer.getPlayer(config.getString("realms." + name + ".owner.uuid")), ThemeType.themeTypes.get(config.getString("realms." + name + ".theme.id")), spawn, config.getInt("realms." + name + ".level"), config.getInt("realms." + name + ".vote"));
-        for (String s : config.getConfigurationSection("realms." + name + ".players").getKeys(false)) {
-            RealmPlayer rp = RealmPlayer.getPlayer(s);
-            if (rp.getOwned() != realm) {
-                realm.addPlayer(rp);
-                realm.promote(rp, RealmRank.getRankByString(config.getString("realms." + name + ".players." + s + ".rank")));
-            }
-        }
-        realm.setOwner(RealmPlayer.getPlayer(config.getString("realms." + name + ".owner.uuid")));
-        realm.setPrivacy(config.getBoolean("realms." + name + ".privacy"));
-        realm.setPerk(config.getString("realms."+name+".perk"));
-        if (config.getConfigurationSection("realms." + name + ".banned") != null) {
-            for (String s : config.getConfigurationSection("realms." + name + ".banned").getKeys(false)) {
-                if (RealmPlayer.getPlayer(s) == null)
-                    new RealmPlayer(s, config.getString("realms." + name + ".banned." + s + ".name"));
-                realm.banPlayer(RealmPlayer.getPlayer(s));
-
-            }
-        }
-    }
-
     public void loadAllRealm() {
 
         if (config.getConfigurationSection("realms") != null) {
-            try {
-                for (String s : config.getConfigurationSection("realms").getKeys(false)) {
+            for (String s : config.getConfigurationSection("realms").getKeys(false)) {
+                try {
                     loadRealm(s);
+                } catch (Exception ex) {
+                    Main.getInstance().getLogger().log(java.util.logging.Level.WARNING, "Skipping invalid realm: " + s, ex);
                 }
+            }
+            try {
                 loadNewRealmPlayer();
                 for (String s : config.getConfigurationSection("realmplayers").getKeys(false)) {
-                    RealmPlayer.getPlayer(s).setLastvote(config.getLong("realmplayers." + s + ".lastvote"));
-                    for (String sr : config.getStringList("realmplayers." + s + ".voted")) {
-                        if (sr != null) {
-                            RealmPlayer.getPlayer(s).addRealmVoted(RealmPlayer.getPlayer(sr).getOwned());
+                    RealmPlayer rp = RealmPlayer.getPlayer(s);
+                    if (rp != null) {
+                        rp.setLastvote(config.getLong("realmplayers." + s + ".lastvote"));
+                        for (String sr : config.getStringList("realmplayers." + s + ".voted")) {
+                            if (sr != null) {
+                                RealmPlayer votedPlayer = RealmPlayer.getPlayer(sr);
+                                if (votedPlayer != null && votedPlayer.getOwned() != null) {
+                                    rp.addRealmVoted(votedPlayer.getOwned());
+                                }
+                            }
                         }
                     }
-
                 }
-                System.out.println("[AdvancedRealm] Succefully loaded all realms !");
+                Main.getInstance().getLogger().info("Successfully loaded all realms !");
             } catch (Exception ex) {
-                System.out.println("[AdvancedRealm] failed to load all realms, an error occured , please try to reinstall the plugin or call @iPazu#9120 on discord \n cause: " + ex.getCause() + "\n trace:");
-                ex.printStackTrace();
+                Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Failed to load realm players", ex);
             }
         }
     }
-
     public void removeVotes(Realm deletedrealm) {
 
         String deletedName = deletedrealm.getOwner().getUniqueId();
@@ -265,8 +280,7 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception ex) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            ex.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", ex);
         }
     }
 
@@ -276,7 +290,10 @@ public class RealmConfig {
         }
         String laststring = Iterables.getLast(config.getConfigurationSection("realms").getKeys(false));
         ConfigurationSection section = config.getConfigurationSection("realms." + laststring + ".theme.spawn");
-        return new Location(ConfigFiles.getWorld(), section.getDouble("x"), 66, section.getDouble("z"));
+        if (section != null) {
+            return new Location(ConfigFiles.getWorld(), section.getDouble("x"), 66, section.getDouble("z"));
+        }
+        return new Location(ConfigFiles.getWorld(), ConfigFiles.getRealmspacing(), 66, 0);
     }
 
     public Location getNewLocation() {
@@ -292,26 +309,24 @@ public class RealmConfig {
         try {
             config.save(file);
         } catch (Exception e) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            e.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", e);
         }
     }
 
     public void updateMultipleVote(RealmPlayer rp) {
         config.set("realmplayers." + rp.getUniqueId() + ".voted", rp.voteduuid);
         for (String s : rp.voteduuid)
-            System.out.println(s);
+            Main.getInstance().getLogger().info(s);
         try {
             config.save(file);
         } catch (Exception e) {
-            System.out.println("[AdvancedRealm] Error while loading the realm.yml file, check if it is deleted or try to reinstall the plugin. If you don't sucess at solving the problem you can contact iPazu#3982 at discord");
-            e.printStackTrace();
+            Main.getInstance().getLogger().log(java.util.logging.Level.SEVERE, "Error while loading the realm.yml file", e);
         }
     }
     private void useless()
     {
         ArrayList<String> strs = new ArrayList<>();
-        strs.forEach(System.out::println);
+        strs.forEach(s -> Main.getInstance().getLogger().info(s));
     }
 }
 

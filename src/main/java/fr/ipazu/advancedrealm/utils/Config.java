@@ -41,8 +41,30 @@ public enum Config {
         return folder;
     }
 
+    private static final java.util.Map<String, String> MATERIAL_ALIASES = new java.util.HashMap<>();
+    static {
+        MATERIAL_ALIASES.put("DARK_OAK_DOOR_ITEM", "DARK_OAK_DOOR");
+        MATERIAL_ALIASES.put("WOOD_SWORD", "WOODEN_SWORD");
+        MATERIAL_ALIASES.put("SKULL_ITEM", "PLAYER_HEAD");
+        MATERIAL_ALIASES.put("STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE");
+        MATERIAL_ALIASES.put("BED", "RED_BED");
+        MATERIAL_ALIASES.put("WATCH", "CLOCK");
+        MATERIAL_ALIASES.put("INK_SACK", "BLACK_DYE");
+        MATERIAL_ALIASES.put("WOOD", "OAK_PLANKS");
+        MATERIAL_ALIASES.put("STEP", "STONE_SLAB");
+    }
+
     public static Material getMaterial(String name){
-        return Material.getMaterial(name.toUpperCase());
+        if (name == null) return Material.STONE;
+        String upper = name.toUpperCase();
+        Material material = Material.getMaterial(upper);
+        if (material != null) return material;
+        String alias = MATERIAL_ALIASES.get(upper);
+        if (alias != null) {
+            material = Material.getMaterial(alias);
+            if (material != null) return material;
+        }
+        return Material.STONE;
     }
     public static String getStringWithReplacementPlayer(String oldstring, Realm r, RealmPlayer rp){
         String newstring = getStringWithReplacementRealm(oldstring,r);
@@ -61,11 +83,13 @@ public enum Config {
         newstring = newstring.replace("%realm_privacy%",r.getPrivacyString());
         newstring = newstring.replace("%realm_bordersize%",r.getLevel().getBordersize()+"");
         newstring = newstring.replace("%realm_maxplayer%",r.getLevel().getMaxplayer()+"");
+        newstring = newstring.replace("%realm_level%",r.getLevel().getNumber()+"");
         RealmLevel nextlevel = RealmLevel.getLevel(r.getLevel().getNumber() + 1);
         if(nextlevel != null){
             newstring = newstring.replace("%realm_nextbordersize%",nextlevel.getBordersize()+"");
             newstring = newstring.replace("%realm_nextmaxplayer%",nextlevel.getMaxplayer()+"");
             newstring = newstring.replace("%realm_nextlevelcost%",nextlevel.getPrice()+"");
+            newstring = newstring.replace("%realm_nextlevel%",nextlevel.getNumber()+"");
         }
 
         return newstring;

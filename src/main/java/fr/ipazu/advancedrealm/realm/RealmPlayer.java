@@ -1,5 +1,6 @@
 package fr.ipazu.advancedrealm.realm;
 
+import fr.ipazu.advancedrealm.Main;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -78,7 +79,7 @@ public class RealmPlayer {
     private void useless()
     {
         ArrayList<String> strs = new ArrayList<>();
-        strs.forEach(System.out::println);
+        strs.forEach(s -> Main.getInstance().getLogger().info(s));
     }
 
 }

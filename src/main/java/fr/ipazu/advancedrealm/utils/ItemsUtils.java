@@ -1,9 +1,8 @@
 package fr.ipazu.advancedrealm.utils;
 
-
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.SkullType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -11,7 +10,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +19,8 @@ public class ItemsUtils {
     List<String> lore;
     private ItemStack item;
 
-
-    public ItemsUtils(Material material, String name, byte b,List<String> sl) {
-
+    public ItemsUtils(Material material, String name, byte b, List<String> sl) {
         this.item = new ItemStack(material);
-        this.item.setDurability((short) b);
         ItemMeta itemMeta = this.item.getItemMeta();
         itemMeta.setDisplayName(name);
         itemMeta.setLore(sl);
@@ -33,6 +28,7 @@ public class ItemsUtils {
         this.material = material;
         this.name = name;
     }
+
     public ItemsUtils(Material material, boolean b) {
         this.item = new ItemStack(material);
         this.material = material;
@@ -89,7 +85,7 @@ public class ItemsUtils {
 
     public void setUnbreakable() {
         ItemMeta im = this.item.getItemMeta();
-        im.spigot().setUnbreakable(true);
+        im.setUnbreakable(true);
         this.item.setItemMeta(im);
     }
 
@@ -112,23 +108,21 @@ public class ItemsUtils {
     public Material getMaterial() {
         return this.material;
     }
-    public static int getAmount(int id, Player player) {
-        ItemStack[] inv = player.getInventory().getContents();
 
+    public static int getAmount(Material material, Player player) {
+        ItemStack[] inv = player.getInventory().getContents();
         int quantity = 0;
-        for (int i = 0; i < inv.length; i++) {
-            if (inv[i] != null) {
-                if (inv[i].getTypeId() == (id)) {
-                    int cant = inv[i].getAmount();
-                    quantity = quantity + cant;
-                }
+        for (ItemStack itemStack : inv) {
+            if (itemStack != null && itemStack.getType() == material) {
+                quantity += itemStack.getAmount();
             }
         }
         return quantity;
     }
-    public static ItemStack getColoredArmor( Material m, Color c,String name,List<String> s) {
+
+    public static ItemStack getColoredArmor(Material m, Color c, String name, List<String> s) {
         ItemStack i = new ItemStack(m, 1);
-        LeatherArmorMeta meta = (LeatherArmorMeta)i.getItemMeta();
+        LeatherArmorMeta meta = (LeatherArmorMeta) i.getItemMeta();
         meta.setDisplayName(name);
         meta.setLore(s);
         meta.setColor(c);
@@ -137,17 +131,12 @@ public class ItemsUtils {
     }
 
     public static ItemStack getHead(String playername, String name, List<String> lore) {
-        ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) head.getItemMeta();
-        meta.setOwner(playername);
+        meta.setOwnerProfile(Bukkit.createPlayerProfile(playername));
         meta.setDisplayName(name);
         meta.setLore(lore);
         head.setItemMeta(meta);
         return head;
-    }
-    private void useless()
-    {
-        ArrayList<String> strs = new ArrayList<>();
-        strs.forEach(System.out::println);
     }
 }

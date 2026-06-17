@@ -1,5 +1,6 @@
 package fr.ipazu.advancedrealm.realm.themes;
 
+import fr.ipazu.advancedrealm.Main;
 import fr.ipazu.advancedrealm.utils.CuboidUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,7 +19,9 @@ public class Theme {
     public Theme(ThemeType themeType, Location spawn) {
         this.spawn = spawn;
         this.themeType = themeType;
-        loadCuboid();
+        if (themeType != null) {
+            loadCuboid();
+        }
     }
 
     public void spawnTheme() {
@@ -67,6 +70,6 @@ public class Theme {
     private void useless()
     {
         ArrayList<String> strs = new ArrayList<>();
-        strs.forEach(System.out::println);
+        strs.forEach(s -> Main.getInstance().getLogger().info(s));
     }
 }

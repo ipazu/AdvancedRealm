@@ -45,6 +45,14 @@ public class WholeGUI {
                 .build();
         inventory.open(player);
     }
+    public void openUpgradeConfirmGui(Player player, Realm realm) {
+        SmartInventory inventory = SmartInventory.builder()
+                .provider(new UpgradeConfirmProvider(player, realm))
+                .size(3, 9)
+                .title("Confirm Upgrade")
+                .build();
+        inventory.open(player);
+    }
     public void openUnclaimGui(Player player,Realm realm) {
         SmartInventory inventory = SmartInventory.builder()
                 .provider(new RemoveProvider(player, realm))

@@ -2,6 +2,10 @@ package fr.ipazu.advancedrealm;
 
 import fr.ipazu.advancedrealm.commands.*;
 import fr.ipazu.advancedrealm.events.EventManager;
+import fr.minuskube.inv.InventoryManager;
+import fr.minuskube.inv.SmartInvsPlugin;
+
+import java.lang.reflect.Field;
 import fr.ipazu.advancedrealm.realm.Realm;
 import fr.ipazu.advancedrealm.utils.ARExpansion;
 import fr.ipazu.advancedrealm.utils.ConfigFiles;
@@ -10,16 +14,14 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
+
 import java.util.concurrent.Callable;
 
 public class Main extends JavaPlugin {
     private static Main instance;
     public Economy economy = null;
     public static Metrics metrics;
-    public static Class<?> wrapperclass;
+    private InventoryManager invManager;
 
     public static Main getInstance() {
         return instance;
@@ -28,12 +30,25 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null){
-            new ARExpansion(this).register();
+
+        if (!checkDependencies()) {
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
+
+        invManager = new InventoryManager(this);
+        invManager.init();
+        try {
+            Field managerField = SmartInvsPlugin.class.getDeclaredField("invManager");
+            managerField.setAccessible(true);
+            managerField.set(null, invManager);
+        } catch (Exception e) {
+            getLogger().severe("Failed to initialize SmartInvs manager");
+        }
+
+        logOptionalPlugins();
         new ConfigFiles().init();
         new EventManager(this);
-        loadWrapperClass();
         getCommand("unclaim").setExecutor(new Unclaim());
         getCommand("claim").setExecutor(new Claim());
         getCommand("realm").setExecutor(new RealmCommand());
@@ -47,8 +62,37 @@ public class Main extends JavaPlugin {
     public void onDisable() {
     }
 
+    private boolean checkDependencies() {
+        boolean allFound = true;
+        if (Bukkit.getPluginManager().getPlugin("WorldEdit") == null) {
+            getLogger().severe("WorldEdit is required but not installed. Download WorldEdit from https://dev.bukkit.org/projects/worldedit");
+            allFound = false;
+        }
+        if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
+            getLogger().severe("Vault is required but not installed. Download Vault from https://www.spigotmc.org/resources/vault.34315/");
+            allFound = false;
+        }
+        return allFound;
+    }
+
+    private void logOptionalPlugins() {
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            Bukkit.getConsoleSender().sendMessage("§e[AdvancedRealm] PlaceholderAPI found - placeholders enabled");
+        } else {
+            Bukkit.getConsoleSender().sendMessage("§e[AdvancedRealm] PlaceholderAPI not found - placeholders disabled");
+        }
+        if (Bukkit.getPluginManager().getPlugin("Vault") != null && setupEconomy()) {
+            Bukkit.getConsoleSender().sendMessage("§e[AdvancedRealm] Economy plugin found (" + economy.getClass().getSimpleName() + ") - economy features enabled");
+        } else if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
+            Bukkit.getConsoleSender().sendMessage("§e[AdvancedRealm] Vault not found - economy features disabled");
+        } else {
+            Bukkit.getConsoleSender().sendMessage("§e[AdvancedRealm] No economy plugin found - economy features disabled");
+        }
+    }
+
     public boolean setupEconomy() {
-        RegisteredServiceProvider<Economy> economyProvider = Main.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
+        if (Bukkit.getPluginManager().getPlugin("Vault") == null) return false;
+        RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
         if (economyProvider != null) {
             economy = economyProvider.getProvider();
         }
@@ -67,18 +111,6 @@ public class Main extends JavaPlugin {
                 return Realm.allrealm.size();
             }
         }));
-        System.out.println("[AdvancedRealm] Metrics successfully pushed (" + Realm.allrealm.size() + " realms)");
-    }
-
-    public void loadWrapperClass() {
-        URLClassLoader child = null;
-        try {
-            child = new URLClassLoader(new URL[] {new URL("file:///"+Main.getInstance().getDataFolder().getAbsolutePath()+"/../ARWrapper.jar")}, Main.class.getClassLoader());
-            wrapperclass = child.loadClass("fr.ipazu.arwrapper.SchematicWrapper");
-
-        } catch (MalformedURLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
+        getLogger().info("Metrics successfully pushed (" + Realm.allrealm.size() + " realms)");
     }
 }
